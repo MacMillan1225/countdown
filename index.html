@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>倒计时与彩条</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            font-size: 3em;
+            overflow: hidden;
+        }
+        .mycd {
+            font-size: 10rem;
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 30px;
+            background-color: red;
+            animation: fall 3s linear infinite;
+        }
+        @keyframes fall {
+            0% {
+                transform: translateY(-50vh) rotate(var(--rotate-start));
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(50vh) rotate(var(--rotate-end));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="countdown" class="mycd"></div>
+
+    <script>
+        let interval;
+
+        function startCountdown(endTime, display) {
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = endTime - now;
+
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                display.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (distance < 0) {
+                    display.textContent = "倒计时结束";
+                    clearInterval(interval);
+                    startConfetti();
+                }
+            }
+
+            updateCountdown();
+            interval = setInterval(updateCountdown, 1000);
+        }
+
+        function startConfetti() {
+            function createConfetti() {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.setProperty('--rotate-start', `${Math.random() * 360}deg`);
+                confetti.style.setProperty('--rotate-end', `${Math.random() * 360}deg`);
+                confetti.style.animationDuration = `${Math.random() * 3+1}s`;
+                document.body.appendChild(confetti);
+
+                setTimeout(() => {
+                    confetti.remove();
+                }, 4000);
+            }
+
+            setInterval(createConfetti, 100);
+        }
+
+        window.onload = function () {
+            const targetDate = new Date("2024-09-17T14:53:59").getTime(); // 设置目标时间
+            const display = document.querySelector('#countdown');
+            startCountdown(targetDate, display);
+        };
+    </script>
+</body>
+</html>
